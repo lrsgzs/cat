@@ -4,6 +4,9 @@ ERROR_STRING = """\033[31mError:
     {{code}}
 {{error}}: {{text}}\033[0m
 """
+CODE = """
+from outputs import output
+"""
 
 
 class PyCodeClass(object):
@@ -16,5 +19,14 @@ class Functions(object):
         self.functions = [
             "input", "int", "list", "float", "str",
             "repr", "exec", "eval", "isinstance", "exit",
-            "output", "raise"
+            "output"
         ]
+
+
+class Config(object):
+    def __init__(self):
+        self.f = None
+        self.pcc = None
+
+
+cons = Config()

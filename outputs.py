@@ -2,9 +2,9 @@ from configs import *
 import sys
 
 
-def output(codes, pcc, f, tab_count=0):
+def output(codes, con=cons, tab_count=0, print_ends="\\n"):
     i = 0
-    print_end = "\\n"
+    print_end = print_ends
 
     for code in codes:
         if code[0] == "print":  # 打印函数
@@ -40,7 +40,7 @@ def output(codes, pcc, f, tab_count=0):
                     sys.exit()
             if not cout:
                 # 如果没有要打印的内容，就打印end参数（end参数默认是换行符
-                pcc.py_code = pcc.py_code + tab_count * TAB_STRING + "print(end='" + print_end + "')\n"
+                con.pcc.py_code = con.pcc.py_code + tab_count * TAB_STRING + "print(end='" + print_end + "')\n"
             else:
                 # 打印内容
                 texts = ""
@@ -55,46 +55,87 @@ def output(codes, pcc, f, tab_count=0):
                         text = str(text)  # 转成字符串
                     texts = texts + text + ", "  # 加个逗号
                 # 组成代码
-                pcc.py_code = pcc.py_code + tab_count * TAB_STRING + "print(" + texts + "end='" + print_end + "')\n"
+                con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
+                                   "print(" + texts + "end='" + print_end + "')\n")
         elif code[0] == "def":  # 定义函数
             def_name = code[1]  # 名字
             def_ages = code[2]["args"]  # 参数
             def_code = code[2]["code"]  # 代码
             def_age = ""  # 参数字符串
 
-            f.functions.append(def_name)  # 添加到函数表里
+            con.f.functions.append(def_name)  # 添加到函数表里
             for word in def_ages:  # 组成Python能理解的参数表
                 def_age = def_age + word + ", "  # 组成
 
-            pcc.py_code = pcc.py_code + tab_count * TAB_STRING + "def " + def_name + "(" + def_age + "):\n"  # 添加到代码
-            output(def_code, pcc, f, tab_count=tab_count + 1)  # 递归这个函数的代码
+            con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
+                               "def " + def_name + "(" + def_age + "):\n")  # 添加到代码
+            output(def_code, tab_count=tab_count + 1)  # 递归这个函数的代码
         elif code[0] == "raise":
             # 报错函数
             # 没有详细内容，只有raise
             try:
                 _ = code[1]
-            except:
+            except IndexError:
                 code.append(["BaseError", "Default Error Text."])
 
             # 没有文本
             try:
                 _ = code[1][1]
-            except:
+            except IndexError:
                 code[1].append("Default Error Text.")
+            else:
+                if isinstance(code[1][1], str):  # 字符串
+                    if code[1][1][:2] == "^%" or code[1][1][-1:] == "%^":  # 变量
+                        codes = code[1][1][2:-2]  # 提取变量
+                        can_repr = False
+                    else:  # 普通字符串
+                        codes = repr(code[1][1])  # 组成
+                        can_repr = True
+                else:  # 别的东西
+                    codes = repr(code[1][1])  # 组成
+                    can_repr = True
 
-            tmp = """
+            if can_repr:
+                tmp = """
 exec('''error = ERROR_STRING.replace("{{file}}", """ + repr(repr(sys.argv[1])) + """)
 error = error.replace("{{code}}", """ + repr(code.__str__()) + """)
 error = error.replace("{{error}}", """ + repr(str(code[1][0])) + """)
-error = error.replace("{{text}}", """ + repr(str(code[1][1])) + """)
+error = error.replace("{{text}}", """ + repr(str(codes)) + """)
 
 sys.stderr.write(error)
 sys.stderr.flush()
 sys.exit()''')
 """
-            pcc.py_code = pcc.py_code + TAB_STRING * tab_count + tmp
+            else:
+                tmp = """
+exec('''error = ERROR_STRING.replace("{{file}}", """ + repr(repr(sys.argv[1])) + """)
+error = error.replace("{{code}}", """ + repr(code.__str__()) + """)
+error = error.replace("{{error}}", """ + repr(str(code[1][0])) + """)
+error = error.replace("{{text}}", """ + str(codes) + """)
+
+sys.stderr.write(error)
+sys.stderr.flush()
+sys.exit()''')
+"""
+
+            con.pcc.py_code = con.pcc.py_code + TAB_STRING * tab_count + tmp + "\n"
+        elif code[0] == "#":
+            pass
+        elif isinstance(code, str):
+            pass
+        elif code[0] == "set":
+            if isinstance(code[1][1], str):  # 字符串
+                if code[1][1][:2] == "^%" or code[1][1][-1:] == "%^":  # 变量
+                    code[1][1] = code[1][1][2:-2]  # 提取变量
+                else:  # 普通字符串
+                    code[1][1] = repr(code[1][1])  # 组成
+            else:  # 别的东西
+                code[1][1] = repr(code[1][1])  # 组成
+
+            tmp = code[1][0] + " = " + repr(code[1][1])
+            con.pcc.py_code = con.pcc.py_code + TAB_STRING * tab_count + tmp + "\n"
         else:
-            if code[0] in f.functions:  # 在函数表里
+            if code[0] in con.f.functions:  # 在函数表里
                 tmp_code = ""  # 临时代码
                 tmp_code = tmp_code + code[0] + "("  # 函数左边
                 argc = ""  # 普通参数
@@ -123,7 +164,7 @@ sys.exit()''')
                         sys.stderr.flush()
                         sys.exit()
                 tmp_code = tmp_code + argc + argv + ")"  # 组成一行完整的代码
-                pcc.py_code = pcc.py_code + tmp_code + "\n"  # 添加到代码
+                con.pcc.py_code = con.pcc.py_code + tmp_code + "\n"  # 添加到代码
             else:
                 # 没有这个函数就报错
                 error = ERROR_STRING.replace("{{file}}", sys.argv[1])
@@ -136,5 +177,5 @@ sys.exit()''')
                 sys.exit()
 
         # 设置变量
-        print_end = "\\n"
+        print_end = print_ends
         i = i + 1
