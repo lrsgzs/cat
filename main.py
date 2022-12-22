@@ -1,3 +1,10 @@
+"""
+
+    cat语言 | cat lang
+    ~~~~~~~~~~~~~~~~~
+    作者：刘镕硕 / lrs
+
+"""
 import json
 import sys
 from outputs import output
@@ -28,9 +35,6 @@ print("\n-----STARTING-----\n")
 
 # 设置一些变量
 tab_count = 0
-
-# 垃圾代码区
-repr(ERROR_STRING)
 
 # 代码解析，生成py代码
 configs.cons.pcc = PyCodeClass()

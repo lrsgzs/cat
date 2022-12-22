@@ -1,3 +1,10 @@
+"""
+
+    cat语言 | cat lang
+    ~~~~~~~~~~~~~~~~~
+    作者：刘镕硕 / lrs
+
+"""
 from configs import *
 import sys
 

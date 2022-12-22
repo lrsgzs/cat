@@ -1,3 +1,10 @@
+"""
+
+    cat语言 | cat lang
+    ~~~~~~~~~~~~~~~~~
+    作者：刘镕硕 / lrs
+
+"""
 TAB_STRING = "    "
 ERROR_STRING = """\033[31mError:
     File {{file}}
