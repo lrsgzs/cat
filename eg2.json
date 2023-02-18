@@ -1,0 +1,28 @@
+[
+  ["#", "我是注释，下面的代码可以新建函数"], 
+  ["def", "np", {"args": ["sss"], "code": [
+      "我是注释",
+      ["#", "用^%和%^连起来的，中间的是Python表达式"],
+      ["print", [
+        ["^%sss%^", "^%sss%^",  "^%sss%^", "^%sss%^", "^%sss%^", 123]
+      ]]
+  ]}],
+
+  ["#", "使用函数，RUNNING=Hello Hello Hello Hello Hello 123"], 
+  ["np", [
+    ["Hello"]
+  ]], 
+
+  ["#", "set设置变量"], 
+  ["set", ["meow", "Not Has This Arg."]],
+
+  ["#", "exec运行Python命令 eval运行Python表达式"],
+  ["exec", [["a = input('> ')"]]],
+  ["eval", [["print(a)"]]],
+
+  ["#", "output运行cat语言代码"],
+  ["output", [[ [ ["print", [["Hello World"]]] ] ]]],
+
+  ["#", "手动报错"],
+  ["raise", ["Error", "^%meow%^"]]
+]
