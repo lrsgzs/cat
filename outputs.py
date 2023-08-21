@@ -68,7 +68,7 @@ def output(codes, con=cons, tab_count=0, print_ends="\\n"):
             input_tips = code[1]
             to_var = code[2]
             con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
-                               to_var + " = input(" + input_tips + ")")
+                               to_var + " = input(" + repr(input_tips) + ")\n")
         elif code[0] == "def":  # 定义函数
             def_name = code[1]  # 名字
             def_ages = code[2]["args"]  # 参数
