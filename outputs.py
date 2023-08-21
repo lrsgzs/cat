@@ -64,6 +64,11 @@ def output(codes, con=cons, tab_count=0, print_ends="\\n"):
                 # 组成代码
                 con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
                                    "print(" + texts + "end='" + print_end + "')\n")
+        elif code[0] == "input":
+            input_tips = code[1]
+            to_var = code[2]
+            con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
+                               to_var + " = input(" + input_tips + ")")
         elif code[0] == "def":  # 定义函数
             def_name = code[1]  # 名字
             def_ages = code[2]["args"]  # 参数
@@ -77,6 +82,18 @@ def output(codes, con=cons, tab_count=0, print_ends="\\n"):
             con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
                                "def " + def_name + "(" + def_age + "):\n")  # 添加到代码
             output(def_code, tab_count=tab_count + 1)  # 递归这个函数的代码
+        elif code[0] == "if" or code[0] == "elif":
+            pd_eval = code[1]
+            pd_code = code[2]
+
+            con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
+                               code[0] + " " + pd_eval + ":\n")
+            output(pd_code, tab_count=tab_count + 1)
+        elif code[0] == "else":
+            pd_code = code[1]
+            con.pcc.py_code = (con.pcc.py_code + tab_count * TAB_STRING +
+                               "else:\n")
+            output(pd_code, tab_count=tab_count + 1)
         elif code[0] == "raise":
             # 报错函数
             # 没有详细内容，只有raise

@@ -41,6 +41,10 @@ configs.cons.pcc = PyCodeClass()
 configs.cons.f = Functions()
 output(codes)
 
+# create temp file
+with open("_temp_cat_run.py", "w", encoding="utf-8") as f:
+    f.write(configs.cons.pcc.py_code)
+
 # 运行生成结果
 exec(configs.cons.pcc.py_code)
 
